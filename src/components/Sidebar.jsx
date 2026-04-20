@@ -10,10 +10,12 @@ import {
     ChevronRight,
     ChefHat,
     LogOut,
+    CalendarDays,
 } from 'lucide-react';
 
 const navItems = [
     { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
+    { name: 'Reservations', path: '/admin/reservations', icon: CalendarDays },
     { name: 'Menu', path: '/admin/menu', icon: UtensilsCrossed },
     { name: 'Orders', path: '/admin/orders', icon: ClipboardList },
     { name: 'Kitchen', path: '/chef', icon: ChefHat },

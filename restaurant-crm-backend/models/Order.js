@@ -42,6 +42,18 @@ const orderSchema = new mongoose.Schema(
             type: String,
             default: '',
         },
+        isGroupBooking: {
+            type: Boolean,
+            default: false,
+        },
+        deadline: {
+            type: Date,
+            default: null,
+        },
+        suggestions: {
+            type: String,
+            default: '',
+        },
     },
     { timestamps: true }
 );

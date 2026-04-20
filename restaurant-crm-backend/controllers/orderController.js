@@ -6,7 +6,7 @@ const User = require('../models/User');
 // @route   POST /api/orders
 // @access  Private
 const createOrder = asyncHandler(async (req, res) => {
-    const { items, totalPrice, deliveryAddress } = req.body;
+    const { items, totalPrice, deliveryAddress, isGroupBooking, deadline, suggestions } = req.body;
 
     if (!items || items.length === 0) {
         res.status(400);
@@ -19,6 +19,9 @@ const createOrder = asyncHandler(async (req, res) => {
         totalPrice,
         deliveryAddress: deliveryAddress || '',
         tableNumber: req.body.tableNumber || null,
+        isGroupBooking: isGroupBooking || false,
+        deadline: deadline || null,
+        suggestions: suggestions || '',
     });
 
     // Award loyalty points (1 point per ₹1 spent, rounded)

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import { getOrders, updateOrderStatus, deleteOrder } from '../api/orderApi';
-import { Search, Trash2, RefreshCw, Receipt } from 'lucide-react';
+import { Search, Trash2, RefreshCw, Receipt, Users, Clock, AlignLeft } from 'lucide-react';
 
 const STATUSES = ['All', 'Pending', 'Preparing', 'Served', 'Billed', 'Cancelled'];
 const STATUS_COLORS = {
@@ -142,10 +142,23 @@ const AdminOrders = () => {
                                             #{order._id.slice(-6).toUpperCase()}
                                         </td>
                                         <td className="px-6 py-4 font-medium text-secondary">
-                                            {order.customer?.name || 'Guest'}
+                                            <div className="flex items-center gap-1">
+                                                {order.isGroupBooking && <Users className="w-4 h-4 text-purple-500" title="Group Pre-Order"/>}
+                                                {order.customer?.name || 'Guest'}
+                                            </div>
+                                            {order.isGroupBooking && (
+                                                <div className="text-xs text-purple-600 mt-1 flex items-center gap-1 font-semibold">
+                                                    <Clock className="w-3 h-3"/> Due: {order.deadline ? new Date(order.deadline).toLocaleString([], {month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'}) : 'N/A'}
+                                                </div>
+                                            )}
                                         </td>
                                         <td className="px-6 py-4 text-gray-500 max-w-[180px] truncate">
                                             {order.items.map((i) => `${i.name} x${i.quantity}`).join(', ')}
+                                            {order.isGroupBooking && order.suggestions && (
+                                                <div className="text-xs text-gray-400 mt-1 italic truncate flex items-center gap-1" title={order.suggestions}>
+                                                    <AlignLeft className="w-3 h-3 shrink-0" /> {order.suggestions}
+                                                </div>
+                                            )}
                                         </td>
                                         <td className="px-6 py-4 font-semibold">₹{order.totalPrice}</td>
                                         <td className="px-6 py-4 text-gray-400 text-xs">

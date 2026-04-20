@@ -16,13 +16,13 @@ import Reservation from './pages/Reservation';
 import Loyalty from './pages/Loyalty';
 import TableSelection from './pages/TableSelection';
 
-// Admin Pages
 import AdminDashboard from './pages/AdminDashboard';
 import AdminMenu from './pages/AdminMenu';
 import AdminOrders from './pages/AdminOrders';
 import AdminCustomers from './pages/AdminCustomers';
 import Analytics from './pages/Analytics';
 import ChefDashboard from './pages/ChefDashboard';
+import AdminReservations from './pages/AdminReservations';
 
 // Layout wrapper for customer portal (with Navbar)
 const CustomerLayout = ({ children }) => (
@@ -52,6 +52,7 @@ function App() {
 
                         {/* Admin Portal (Sidebar is inside each admin page) */}
                         <Route path="/admin" element={<AdminDashboard />} />
+                        <Route path="/admin/reservations" element={<AdminReservations />} />
                         <Route path="/admin/menu" element={<AdminMenu />} />
                         <Route path="/admin/orders" element={<AdminOrders />} />
                         <Route path="/admin/customers" element={<AdminCustomers />} />

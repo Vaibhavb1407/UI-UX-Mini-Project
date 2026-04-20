@@ -10,6 +10,9 @@ import {
     CheckCircle,
     Star,
     AlertCircle,
+    CalendarDays,
+    Clock,
+    AlignLeft,
 } from 'lucide-react';
 
 const TAX_RATE = 0.05;
@@ -27,6 +30,14 @@ const Order = () => {
     const [placedOrder, setPlacedOrder] = useState(null);
     const [loading, setLoading] = useState(false);
     const [apiError, setApiError] = useState('');
+
+    const [isGroupBooking, setIsGroupBooking] = useState(false);
+    const [groupDate, setGroupDate] = useState('');
+    const [groupTime, setGroupTime] = useState('');
+    const [suggestions, setSuggestions] = useState('');
+    const [groupError, setGroupError] = useState('');
+
+    const timeSlots = ['12:00 PM', '1:00 PM', '2:00 PM', '7:00 PM', '8:00 PM', '9:00 PM'];
 
     const discount = appliedCoupon ? cartTotal * COUPONS[appliedCoupon] : 0;
     const tax = (cartTotal - discount) * TAX_RATE;
@@ -48,9 +59,23 @@ const Order = () => {
             navigate('/login');
             return;
         }
+        
+        if (isGroupBooking) {
+            if (!groupDate || !groupTime) {
+                setGroupError('Please select both date and time for your group booking.');
+                return;
+            }
+        }
+        setGroupError('');
+
         setLoading(true);
         setApiError('');
         try {
+            let deadline = null;
+            if (isGroupBooking && groupDate && groupTime) {
+                deadline = new Date(`${groupDate} ${groupTime}`);
+            }
+
             const payload = {
                 items: cartItems.map((item) => ({
                     menuId: item.id || item._id,
@@ -60,6 +85,9 @@ const Order = () => {
                 })),
                 totalPrice: parseFloat(grandTotal.toFixed(2)),
                 tableNumber: selectedTable,
+                isGroupBooking,
+                deadline,
+                suggestions
             };
             const { data } = await createOrder(payload);
             setPlacedOrder(data);
@@ -177,6 +205,55 @@ const Order = () => {
                                     </div>
                                     {couponError && <p className="text-red-500 text-xs mt-1">{couponError}</p>}
                                 </>
+                            )}
+                        </div>
+
+                        {/* Group Booking Toggle */}
+                        <div className="bg-white rounded-2xl p-5 shadow-sm">
+                            <label className="flex items-center gap-2 cursor-pointer mb-2">
+                                <input 
+                                    type="checkbox" 
+                                    checked={isGroupBooking}
+                                    onChange={(e) => setIsGroupBooking(e.target.checked)}
+                                    className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary"
+                                />
+                                <span className="text-sm font-semibold text-secondary">Make this a Group Pre-Order?</span>
+                            </label>
+
+                            {isGroupBooking && (
+                                <div className="space-y-4 pt-4 border-t border-gray-100 mt-2">
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-600 mb-1 flex items-center gap-1">
+                                            <CalendarDays className="w-3 h-3" /> Date *
+                                        </label>
+                                        <input type="date" value={groupDate} onChange={(e) => {setGroupDate(e.target.value); setGroupError('');}}
+                                            min={new Date().toISOString().split('T')[0]}
+                                            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-primary" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-600 mb-2 flex items-center gap-1">
+                                            <Clock className="w-3 h-3" /> Time Slot *
+                                        </label>
+                                        <div className="grid grid-cols-3 gap-2">
+                                            {timeSlots.map((t) => (
+                                                <button key={t} type="button"
+                                                    onClick={() => {setGroupTime(t); setGroupError('');}}
+                                                    className={`py-1.5 rounded-lg text-xs font-medium border transition ${groupTime === t ? 'bg-primary text-white border-primary' : 'border-gray-200 text-gray-600 hover:border-primary'}`}>
+                                                    {t}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-600 mb-1 flex items-center gap-1">
+                                            <AlignLeft className="w-3 h-3" /> Special Instructions for Chef
+                                        </label>
+                                        <textarea value={suggestions} onChange={(e) => setSuggestions(e.target.value)} rows={3}
+                                            placeholder="Allergies, preferences, exact timing..."
+                                            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-primary resize-none" />
+                                    </div>
+                                    {groupError && <p className="text-red-500 text-xs mt-1 bg-red-50 p-2 rounded">{groupError}</p>}
+                                </div>
                             )}
                         </div>
 

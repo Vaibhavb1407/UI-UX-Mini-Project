@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getActiveOrders, updateOrderStatus } from '../api/orderApi';
 import { io } from 'socket.io-client';
-import { AlertCircle, Clock, ChefHat, Check } from 'lucide-react';
+import { AlertCircle, Clock, ChefHat, Check, Users, MessageSquare } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 
 // We need to determine the socket URL. When using vite proxy, we might need to connect to backend URL in dev
@@ -107,27 +107,54 @@ const ChefDashboard = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                         {orders.map((order) => {
                             const isNew = order.status === 'Pending';
+                            const isGroup = order.isGroupBooking;
+                            
+                            const borderColor = isNew 
+                                ? (isGroup ? 'border-purple-500/50 shadow-[0_0_15px_rgba(168,85,247,0.1)]' : 'border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.1)]') 
+                                : 'border-blue-500/30';
+                            const headerColor = isNew 
+                                ? (isGroup ? 'bg-purple-500/10' : 'bg-yellow-500/10') 
+                                : 'bg-blue-500/10';
+                            const badgeColor = isNew 
+                                ? (isGroup ? 'bg-purple-500 text-purple-900' : 'bg-yellow-500 text-yellow-900') 
+                                : 'bg-blue-500 text-blue-900';
+
                             return (
-                                <div key={order._id} className={`bg-gray-800 rounded-2xl overflow-hidden border ${isNew ? 'border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.1)]' : 'border-blue-500/30'}`}>
+                                <div key={order._id} className={`bg-gray-800 rounded-2xl overflow-hidden border ${borderColor}`}>
                                     {/* Header */}
-                                    <div className={`p-4 flex justify-between items-center ${isNew ? 'bg-yellow-500/10' : 'bg-blue-500/10'}`}>
+                                    <div className={`p-4 flex justify-between items-center ${headerColor}`}>
                                         <div>
-                                            <span className="font-bold text-lg">Order #{order._id.slice(-4).toUpperCase()}</span>
-                                            <div className="text-sm text-gray-400 mt-1 flex items-center gap-2">
+                                            <span className="font-bold text-lg flex items-center gap-1">
+                                                {isGroup && <Users className="w-4 h-4 text-purple-400" />}
+                                                Order #{order._id.slice(-4).toUpperCase()}
+                                            </span>
+                                            <div className="text-sm text-gray-400 mt-1 flex flex-wrap items-center gap-2">
                                                 <span className="bg-gray-700 px-2 py-0.5 rounded text-xs">
                                                     Table: {order.tableNumber || 'Takeaway'}
                                                 </span>
                                                 <span className="flex items-center gap-1">
                                                     <Clock className="w-3 h-3" />
-                                                    {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    {isGroup && order.deadline 
+                                                        ? `Due: ${new Date(order.deadline).toLocaleString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })}`
+                                                        : new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                                                    }
                                                 </span>
                                             </div>
                                         </div>
-                                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${isNew ? 'bg-yellow-500 text-yellow-900' : 'bg-blue-500 text-blue-900'}`}>
+                                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${badgeColor}`}>
                                             {order.status}
                                         </span>
                                     </div>
                                     
+                                    {isGroup && order.suggestions && (
+                                        <div className="px-4 pt-3 bg-gray-800/50">
+                                            <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-2.5 text-sm text-purple-200 flex gap-2">
+                                                <MessageSquare className="w-4 h-4 shrink-0 mt-0.5 text-purple-400" />
+                                                <p className="leading-relaxed">{order.suggestions}</p>
+                                            </div>
+                                        </div>
+                                    )}
+
                                     {/* Items */}
                                     <div className="p-4 bg-gray-800/50">
                                         <ul className="space-y-3">
