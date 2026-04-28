@@ -149,7 +149,7 @@ const Analytics = () => {
                                 {data.statusBreakdown.map((s) => {
                                     const total = data.statusBreakdown.reduce((a, b) => a + b.count, 0);
                                     const pct = total ? Math.round((s.count / total) * 100) : 0;
-                                    const colors = { Pending: 'bg-yellow-400', Preparing: 'bg-blue-400', Delivered: 'bg-green-400', Cancelled: 'bg-red-400' };
+                                    const colors = { Pending: 'bg-yellow-400', Preparing: 'bg-blue-400', Served: 'bg-green-400', Billed: 'bg-purple-400', Cancelled: 'bg-red-400' };
                                     return (
                                         <div key={s._id}>
                                             <div className="flex justify-between text-sm mb-1">

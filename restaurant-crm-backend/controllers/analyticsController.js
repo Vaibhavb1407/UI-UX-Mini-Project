@@ -14,7 +14,7 @@ const getDashboard = asyncHandler(async (req, res) => {
 
     // Total revenue (sum of all delivered orders)
     const revenueResult = await Order.aggregate([
-        { $match: { status: { $in: ['Delivered', 'Preparing', 'Pending'] } } },
+        { $match: { status: { $in: ['Billed', 'Served', 'Preparing', 'Pending'] } } },
         { $group: { _id: null, total: { $sum: '$totalPrice' } } },
     ]);
     const totalRevenue = revenueResult.length > 0 ? revenueResult[0].total : 0;
@@ -47,7 +47,11 @@ const getDashboard = asyncHandler(async (req, res) => {
                     $dateToString: { format: '%Y-%m-%d', date: '$createdAt' },
                 },
                 count: { $sum: 1 },
-                revenue: { $sum: '$totalPrice' },
+                revenue: { 
+                    $sum: { 
+                        $cond: [{ $in: ['$status', ['Pending', 'Preparing', 'Served', 'Billed']] }, '$totalPrice', 0] 
+                    } 
+                },
             },
         },
         { $sort: { _id: 1 } },
@@ -76,6 +80,7 @@ const getDashboard = asyncHandler(async (req, res) => {
 
     // ── Category Revenue ──────────────────────────────────
     const categoryRevenue = await Order.aggregate([
+        { $match: { status: { $in: ['Pending', 'Preparing', 'Served', 'Billed'] } } },
         { $unwind: '$items' },
         {
             $group: {

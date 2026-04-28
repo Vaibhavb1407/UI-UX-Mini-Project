@@ -8,7 +8,8 @@ import { ShoppingBag, DollarSign, Users, CalendarDays, TrendingUp } from 'lucide
 const statusColors = {
     Pending: 'bg-yellow-100 text-yellow-700',
     Preparing: 'bg-blue-100 text-blue-700',
-    Delivered: 'bg-green-100 text-green-700',
+    Served: 'bg-green-100 text-green-700',
+    Billed: 'bg-purple-100 text-purple-700',
     Cancelled: 'bg-red-100 text-red-600',
 };
 
